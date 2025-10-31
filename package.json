@@ -13,7 +13,7 @@
   "license": "ISC",
   "type": "module",
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+  "seed": "ts-node --skipProject --compilerOptions '{\"module\":\"CommonJS\"}' prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.17.1",
