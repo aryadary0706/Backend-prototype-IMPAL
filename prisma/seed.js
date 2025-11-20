@@ -1,4 +1,4 @@
-// prisma/seed.ts
+// prisma/seed.js
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 
@@ -29,7 +29,7 @@ async function main() {
     ],
   })
 
-  console.log(`Seeding selesai. user berhasil dibuat.`);
+  console.log(`Seeding selesai. ${3} user berhasil dibuat.`);
 }
 
 main()
