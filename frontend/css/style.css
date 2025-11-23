@@ -159,3 +159,18 @@ button[type="submit"]:hover, #logout-btn:hover {
 .upload-section p {
   color: #666;
 }
+
+.gallery {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+.gallery img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #ccc;
+}

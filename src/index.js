@@ -74,6 +74,93 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// =======================================================
+// CREATE IDENTIFICATION (Masuk ke user.identifications[])
+// =======================================================
+app.post("/identification", async (req, res) => {
+  try {
+    const {
+      userId,
+      imagePath,
+      plantName,
+      diseaseName,
+      diseaseDescription,
+      confidenceScore
+    } = req.body;
+
+    const created = await prisma.identification.create({
+      data: {
+        imagePath: imagePath || "belum diketahui",
+        plantName: plantName || "belum diketahui",
+        diseaseName: diseaseName || "belum diketahui",
+        diseaseDescription: diseaseDescription || "belum diketahui",
+        confidenceScore: confidenceScore ? parseFloat(confidenceScore) : 0.0,
+
+        // masukkan ke relasi user.identifications[]
+        user: {
+          connect: { id: userId }
+        }
+      }
+    });
+
+    res.json({
+      message: "Identification berhasil dibuat",
+      data: created
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Gagal membuat identification" });
+  }
+});
+
+
+// =======================================================
+// HISTORY — READ ALL IDENTIFICATIONS BY USER
+// =======================================================
+app.get("/history/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const history = await prisma.identification.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" }
+    });
+
+    res.json({
+      message: "History ditemukan",
+      total: history.length,
+      data: history
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Gagal mengambil history" });
+  }
+});
+
+
+// =======================================================
+// HISTORY — DELETE 1 IDENTIFICATION (BY ID)
+// =======================================================
+app.delete("/history/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await prisma.identification.delete({
+      where: { id }
+    });
+
+    res.json({
+      message: "Identification berhasil dihapus",
+      deletedId: id
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Gagal menghapus data" });
+  }
+});
+
 // ---------------- START SERVER ----------------
 app.listen(3000, () => {
   console.log("Server running on http://localhost:3000");
