@@ -60,9 +60,9 @@ export function removeToken() {
 export function getUserFromToken() {
   const token = getToken();
   if (!token) return null;
-
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
+    console.log('Decoded token payload:', payload);
     return payload;
   } catch (error) {
     console.error('Invalid token:', error);

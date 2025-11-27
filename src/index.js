@@ -3,6 +3,7 @@ import cors from "cors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
+import upload from "./middleware/upload.js"; 
 import 'dotenv/config';
 
 const prisma = new PrismaClient();
@@ -11,8 +12,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use("/uploads", express.static("uploads"));
+
 // SECRET KEY untuk JWT
-const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret_for_dev";
+const JWT_SECRET = process.env.JWT_SECRET || "1028391279127390172390106438658023600234";
 
 // ---------------- REGISTER ----------------
 app.post("/register", async (req, res) => {
@@ -57,7 +60,7 @@ app.post("/login", async (req, res) => {
 
     // Buat JWT Token
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { userId: user.id, email: user.email, name: user.name },
       JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -81,31 +84,47 @@ app.post("/identification", async (req, res) => {
   try {
     const {
       userId,
-      imagePath,
       plantName,
       diseaseName,
       diseaseDescription,
-      confidenceScore
+      confidenceScore,
+      imageBase64
     } = req.body;
 
-    const created = await prisma.identification.create({
+    // Convert base64 → buffer
+    const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+    const buffer = Buffer.from(base64Data, "base64");
+
+    // nama file unik
+    const fileName = `${Date.now()}.jpg`;
+
+    // Upload ke Supabase Storage
+    const { data, error } = await supabase.storage
+      .from("plant-images")
+      .upload(fileName, buffer, {
+        contentType: "image/jpeg"
+      });
+
+    if (error) return res.status(500).json({ error: "Upload failed", detail: error });
+
+    // URL PUBLIC gambar
+    const imageUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/plant-images/${fileName}`;
+
+    // Simpan ke database Prisma
+    const identification = await prisma.identification.create({
       data: {
-        imagePath: imagePath || "belum diketahui",
+        userId,
+        imagePath: imageUrl,
         plantName: plantName || "belum diketahui",
         diseaseName: diseaseName || "belum diketahui",
         diseaseDescription: diseaseDescription || "belum diketahui",
-        confidenceScore: confidenceScore ? parseFloat(confidenceScore) : 0.0,
-
-        // masukkan ke relasi user.identifications[]
-        user: {
-          connect: { id: userId }
-        }
+        confidenceScore: parseFloat(confidenceScore) || 0.0
       }
     });
 
     res.json({
       message: "Identification berhasil dibuat",
-      data: created
+      identification
     });
 
   } catch (err) {
@@ -113,7 +132,6 @@ app.post("/identification", async (req, res) => {
     res.status(500).json({ error: "Gagal membuat identification" });
   }
 });
-
 
 // =======================================================
 // HISTORY — READ ALL IDENTIFICATIONS BY USER
