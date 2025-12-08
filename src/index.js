@@ -2,8 +2,7 @@ import express from "express";
 import cors from "cors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
-import upload from "./middleware/upload.js"; 
+import { PrismaClient } from "@prisma/client"; 
 import 'dotenv/config';
 
 const prisma = new PrismaClient();
@@ -12,7 +11,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/uploads", express.static("uploads"));
 
 // SECRET KEY untuk JWT
 const JWT_SECRET = process.env.JWT_SECRET || "1028391279127390172390106438658023600234";
@@ -91,24 +89,34 @@ app.post("/identification", async (req, res) => {
       imageBase64
     } = req.body;
 
+    if (!imageBase64) 
+      return res.status(400).json({ error: "imageBase64 tidak ditemukan" });
+
+    if (!userId)
+      return res.status(400).json({ error: "userId wajib" });
+
     // Convert base64 → buffer
     const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
     const buffer = Buffer.from(base64Data, "base64");
 
     // nama file unik
-    const fileName = `${Date.now()}.jpg`;
+    const fileName = `${crypto.randomUUID()}.jpg`;
+    const filePath = `identification/${fileName}`;
 
     // Upload ke Supabase Storage
-    const { data, error } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from("plant-images")
-      .upload(fileName, buffer, {
-        contentType: "image/jpeg"
-      });
+      .upload(filePath, buffer, { contentType: "image/jpeg" });
 
-    if (error) return res.status(500).json({ error: "Upload failed", detail: error });
+    if (uploadError)
+      return res.status(500).json({ error: "Upload failed", detail: uploadError });
 
-    // URL PUBLIC gambar
-    const imageUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/plant-images/${fileName}`;
+    // Dapatkan URL public
+    const { data: urlData } = supabase.storage
+      .from("plant-images")
+      .getPublicUrl(filePath);
+
+    const imageUrl = urlData.publicUrl;
 
     // Simpan ke database Prisma
     const identification = await prisma.identification.create({
@@ -132,6 +140,7 @@ app.post("/identification", async (req, res) => {
     res.status(500).json({ error: "Gagal membuat identification" });
   }
 });
+
 
 // =======================================================
 // HISTORY — READ ALL IDENTIFICATIONS BY USER

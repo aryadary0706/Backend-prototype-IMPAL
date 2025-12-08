@@ -1,10 +1,7 @@
 import { getToken, getUserFromToken, removeToken } from './api.js';
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const input = document.getElementById('image-upload');
 const gallery = document.getElementById('gallery');
@@ -41,6 +38,15 @@ input.addEventListener('change', function () {
   gallery.appendChild(img);
 });
 
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 async function uploadToSupabase(file) {
   const fileExt = file.name.split('.').pop();
   const fileName = `${Date.now()}.${fileExt}`;
@@ -72,9 +78,7 @@ document.getElementById("submit-btn").addEventListener("click", async () => {
     return;
   }
 
-  // 1️⃣ Upload ke Supabase Storage
-  const imageUrl = await uploadToSupabase(selectedFile);
-  if (!imageUrl) return;
+  const base64 = await toBase64(selectedFile);
 
   // 2️⃣ Kirim data ke backend
   const payload = {
@@ -83,7 +87,8 @@ document.getElementById("submit-btn").addEventListener("click", async () => {
     plantName: "Belum diketahui",
     diseaseName: "Belum diketahui",
     diseaseDescription: "Belum diketahui",
-    confidenceScore: 0
+    confidenceScore: 0,
+    imageBase64: base64
   };
 
   const res = await fetch("http://localhost:3000/identification", {
@@ -94,6 +99,5 @@ document.getElementById("submit-btn").addEventListener("click", async () => {
 
   const result = await res.json();
   console.log(result);
-
   alert("Upload dan penyimpanan berhasil!");
 });
