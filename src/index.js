@@ -75,9 +75,8 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// =======================================================
+
 // CREATE IDENTIFICATION (Masuk ke user.identifications[])
-// =======================================================
 app.post("/identification", async (req, res) => {
   try {
     const {
@@ -86,37 +85,13 @@ app.post("/identification", async (req, res) => {
       diseaseName,
       diseaseDescription,
       confidenceScore,
-      imageBase64
     } = req.body;
 
-    if (!imageBase64) 
-      return res.status(400).json({ error: "imageBase64 tidak ditemukan" });
+    if (!imagePath) 
+      return res.status(400).json({ error: "imagePath Tidak Ditemukan!" });
 
     if (!userId)
       return res.status(400).json({ error: "userId wajib" });
-
-    // Convert base64 → buffer
-    const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
-    const buffer = Buffer.from(base64Data, "base64");
-
-    // nama file unik
-    const fileName = `${crypto.randomUUID()}.jpg`;
-    const filePath = `identification/${fileName}`;
-
-    // Upload ke Supabase Storage
-    const { error: uploadError } = await supabase.storage
-      .from("plant-images")
-      .upload(filePath, buffer, { contentType: "image/jpeg" });
-
-    if (uploadError)
-      return res.status(500).json({ error: "Upload failed", detail: uploadError });
-
-    // Dapatkan URL public
-    const { data: urlData } = supabase.storage
-      .from("plant-images")
-      .getPublicUrl(filePath);
-
-    const imageUrl = urlData.publicUrl;
 
     // Simpan ke database Prisma
     const identification = await prisma.identification.create({
@@ -142,9 +117,7 @@ app.post("/identification", async (req, res) => {
 });
 
 
-// =======================================================
 // HISTORY — READ ALL IDENTIFICATIONS BY USER
-// =======================================================
 app.get("/history/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
