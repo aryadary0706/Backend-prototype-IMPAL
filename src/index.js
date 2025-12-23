@@ -4,11 +4,10 @@ import "dotenv/config";
 import router from "./routes/router.js";
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-app.use("/api", router);
+app.use("/", router);
 
 // ---------------- START SERVER ----------------
 app.listen(3000, () => {

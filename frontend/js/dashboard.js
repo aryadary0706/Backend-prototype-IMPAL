@@ -59,6 +59,9 @@ document.getElementById("submit-btn").addEventListener("click", async () => {
     const res = await fetch("http://localhost:3000/identification", {
       method: "POST",
       // Jangan set Content-Type header secara manual saat menggunakan FormData
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
       body: formData 
     });
 
