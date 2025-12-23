@@ -1,7 +1,11 @@
+import { prisma, supabase } from "../db.js";
+import 'dotenv/config';
+
 export const uploadIdentification = async (req, res) => {
-    try {
-    const { userId, plantName, diseaseName, diseaseDescription, confidenceScore } = req.body;
-    const file = req.file; // Ini file dari frontend
+  try {
+    const userId = req.user.userId; 
+    const { plantName, diseaseName, diseaseDescription, confidenceScore } = req.body;
+    const file = req.file;
 
     if (!file) return res.status(400).json({ error: "File gambar tidak ditemukan!" });
     if (!userId) return res.status(400).json({ error: "userId wajib" });

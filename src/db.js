@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client"; 
-import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
+import 'dotenv/config';
 
 export const prisma = new PrismaClient();
 export const supabase = createClient(
