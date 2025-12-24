@@ -9,32 +9,34 @@
 </head>
 <body>
   <nav class="navbar">
-  <div class="profile-section">
-    <div class="profile-avatar">🌱</div>
-    <span id="user-name">User</span>
-  </div>
-  <div>
-    <a href="dashboard.html" class="nav-link">Home</a>
-    <a href="history.html" class="nav-link">History</a>
-    <button id="logout-btn">Logout</button>
-  </div>
-</nav>
-</nav>
+    <div class="profile-section">
+      <div class="profile-avatar">🌱</div>
+      <span id="user-name">User</span>
+    </div>
+    <div>
+      <a href="dashboard.html" class="nav-link">Home</a>
+      <a href="history.html" class="nav-link">History</a>
+      <button id="logout-btn">Logout</button>
+    </div>
+  </nav>
 
   <div class="container">
-    <div class="dashboard-card">
-      <h2>Selamat Datang!</h2>
-      <p>Anda berhasil login. Dashboard identifikasi penyakit tanaman akan ditambahkan di sini.</p>
-      
-      <!-- Placeholder untuk fitur upload gambar & identifikasi -->
       <div class="upload-section">
         <h3>Unggah Gambar Tanaman</h3>
+        
         <input type="file" id="image-upload" accept="image/*">
+        
+        <label for="image-upload" class="upload-area" id="upload-area">
+          <div class="upload-icon">🖼️</div>
+          <div class="upload-text">
+            Drop your images here or <strong>browse</strong>
+          </div>
+          <div class="upload-subtext">Supports JPG, JPEG, PNG</div>
+        </label>
         
         <div id="gallery" class="gallery"></div>
         <button id="submit-btn">Upload</button>
       </div>
-    </div>
   </div>
 
   <script type="module" src="js/dashboard.js"></script>

@@ -44,10 +44,22 @@ async function loadHistory() {
     const items = response.data || [];
     
     if (items.length === 0) {
-      historyList.innerHTML = '<p style="text-align:center; color:#666;">Belum ada riwayat identifikasi</p>';
-      return;
+        historyList.className = '';
+        historyList.innerHTML = `
+        <div class="empty-state">
+            <div class="empty-state-image">
+                <img src="/frontend/assets/I2.jpg" alt="Plant illustration"/>
+            </div>
+            <div class="empty-state-content">
+                <h3>Belum ada riwayat identifikasi 🌱</h3>
+                <p>Ayo perbanyak pohon dan cek kesehatan tanamanmu dengan PlantDoc.</p>
+            </div>
+        </div>
+        `;
+    return;
     }
 
+    historyList.className = 'history-container';
     historyList.innerHTML = items.map(item => `
       <div class="history-card">
         <img src="${item.imagePath}" alt="Plant" class="history-img" onerror="this.src='https://via.placeholder.com/260x180?text=No+Image'">

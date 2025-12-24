@@ -68,6 +68,9 @@ document.getElementById("submit-btn").addEventListener("click", async () => {
     const result = await res.json();
     console.log(result);
     alert("Berhasil disimpan ke database via backend!");
+
+    window.location.href = 'history.html';
+
   } catch (err) {
     console.error(err);
     alert("Terjadi kesalahan saat upload.");

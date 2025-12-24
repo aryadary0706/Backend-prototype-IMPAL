@@ -7,33 +7,45 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="container">
-    <div class="auth-card">
-      <h1>Plant Disease Identification</h1>
-      
-      <!-- Tab Switcher -->
-      <div class="tabs">
-        <button id="login-tab" class="tab active">Login</button>
-        <button id="register-tab" class="tab">Register</button>
+  <div class="split-container">
+    <div class="split-left">
+      <div class="auth-wrapper">
+        <div class="logo-section">
+          <h1>Plant Disease<br>Identification</h1>
+          <p class="subtitle">Identifikasi penyakit tanaman dengan mudah</p>
+        </div>
+
+        <div class="tabs">
+          <button id="login-tab" class="tab active">Login</button>
+          <button id="register-tab" class="tab">Register</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" class="form active">
+          <input type="email" id="login-email" placeholder="Email" required>
+          <input type="password" id="login-password" placeholder="Password" required>
+          <button type="submit">Login</button>
+          <p class="error" id="login-error"></p>
+        </form>
+
+        <!-- Register Form -->
+        <form id="register-form" class="form">
+          <input type="text" id="register-name" placeholder="Nama" required>
+          <input type="email" id="register-email" placeholder="Email" required>
+          <input type="password" id="register-password" placeholder="Password" required>
+          <button type="submit">Register</button>
+          <p class="error" id="register-error"></p>
+          <p class="success" id="register-success"></p>
+        </form>
       </div>
+    </div>
 
-      <!-- Login Form -->
-      <form id="login-form" class="form active">
-        <input type="email" id="login-email" placeholder="Email" required>
-        <input type="password" id="login-password" placeholder="Password" required>
-        <button type="submit">Login</button>
-        <p class="error" id="login-error"></p>
-      </form>
-
-      <!-- Register Form -->
-      <form id="register-form" class="form">
-        <input type="text" id="register-name" placeholder="Nama" required>
-        <input type="email" id="register-email" placeholder="Email" required>
-        <input type="password" id="register-password" placeholder="Password" required>
-        <button type="submit">Register</button>
-        <p class="error" id="register-error"></p>
-        <p class="success" id="register-success"></p>
-      </form>
+    <div class="split-right">
+      <img src="assets/I1.jpg" alt="Plant Disease" class="hero-image">
+      <div class="hero-overlay">
+        <div class="hero-content">
+        </div>
+      </div>
     </div>
   </div>
 
