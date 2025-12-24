@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { prisma } from "../db.js";
 import 'dotenv/config';
 import { authenticateToken } from "../middleware/authmiddleware.js";
+import { v4 as uuidv4 } from 'uuid';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -53,6 +54,7 @@ export const register = async (req, res) => {
         // Simpan user
         await prisma.user.create({
           data: {
+            id: uuidv4(),
             email,
             name,
             password: hashedPassword,

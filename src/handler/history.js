@@ -1,11 +1,20 @@
+import { prisma, supabase } from "../db.js";
+import 'dotenv/config';
+
 export const getUserHistory = async (req, res) => {
-      try {
-    const userId = req.user.userId; // Ambil ID dari token, bukan dari URL
+  try {    
+    const userId = req.user.userId;
+
+    if (!userId) {
+      return res.status(401).json({ error: "User ID tidak ditemukan dalam token" });
+    }
 
     const history = await prisma.identification.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" }
     });
+
+    console.log('History found:', history.length, 'items'); // Log results
 
     res.json({
       message: "History ditemukan",
@@ -13,7 +22,12 @@ export const getUserHistory = async (req, res) => {
       data: history
     });
   } catch (err) {
-    res.status(500).json({ error: "Gagal mengambil history" });
+    console.error('Full error in getUserHistory:', err); // This will show the actual error
+    console.error('Error stack:', err.stack); // Show stack trace
+    res.status(500).json({ 
+      error: "Gagal mengambil history",
+      details: err.message // Send error details to frontend for debugging
+    });
   }
 }
 

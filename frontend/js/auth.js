@@ -1,4 +1,6 @@
-  import { register, login, saveToken } from './api.js';
+import { register, login } from './api.js';
+import { saveToken } from './authStorage.js';
+
 
   // Tab Switching
   const loginTab = document.getElementById('login-tab');
