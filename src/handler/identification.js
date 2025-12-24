@@ -4,17 +4,19 @@ import 'dotenv/config';
 export const uploadIdentification = async (req, res) => {
   try {
     const userId = req.user.userId; 
-    const { plantName, diseaseName, diseaseDescription, confidenceScore } = req.body;
+    const { plantName, diseaseName, diseaseDescription, confidenceScore, TreatmentAdvice, isHealthy } = req.body;
     const file = req.file;
 
     if (!file) return res.status(400).json({ error: "File gambar tidak ditemukan!" });
-    if (!userId) return res.status(400).json({ error: "userId wajib" });
+    if (!userId) return res.status(400).json({ error: "User belum login!" });
 
-    // 1. Upload ke Supabase Storage via Backend
-    const fileName = `${Date.now()}-${file.originalname}`;
-    const filePath = `identifications/${userId}/${fileName}`;
+    let Tempfilename = isHealthy ? 'healthy-' + file.originalname.toLowerCase().replace(/\s+/g, '-') : 'disease-' + file.originalname.toLowerCase().replace(/\s+/g, '-');
+    let TempfilePath = isHealthy ? `identifications/${userId}/healthy/${Tempfilename}` : `identifications/${userId}/disease/${Tempfilename}`;
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const fileName = Tempfilename;
+    const filePath = TempfilePath;
+
+    const { error: uploadError } = await supabase.storage
       .from("plant-image")
       .upload(filePath, file.buffer, {
         contentType: file.mimetype,
@@ -28,16 +30,33 @@ export const uploadIdentification = async (req, res) => {
       .getPublicUrl(filePath);
 
     // 3. Simpan ke Database Prisma
-    const identification = await prisma.identification.create({
-      data: {
-        userId,
-        imagePath: urlData.publicUrl, // Simpan URL publiknya
-        plantName: plantName || "Belum diketahui",
-        diseaseName: diseaseName || "Belum diketahui",
-        diseaseDescription: diseaseDescription || "Belum diketahui",
-        confidenceScore: parseFloat(confidenceScore) || 0.0
+    let identification;
+    await prisma.$transaction(async (tx) => {
+      identification = await tx.identification.create({
+        data: {
+          userId,
+          imagePath: urlData.publicUrl,
+          plantName: plantName || "PROTOTYPE",
+          diseaseName: diseaseName || "PROTOTYPE",
+          diseaseDescription: diseaseDescription || "Data manual (AI belum aktif)",
+          confidenceScore: parseFloat(confidenceScore) || 0.0,
+          TreatmentAdvice: TreatmentAdvice ||"Data manual (AI belum aktif)",
+          isHealthy: false
+        }
+      });
+
+      const history = await tx.historyManager.create({
+        data: {
+          userId,
+          resultId: identification.id
+        }
+      });
+
+      if (!history) {
+        throw new Error("History gagal dibuat");
       }
     });
+
 
     res.json({
       message: "Upload dan Identifikasi berhasil",

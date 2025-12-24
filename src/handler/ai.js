@@ -1,0 +1,1 @@
+// Kalo udah ada sistem AI

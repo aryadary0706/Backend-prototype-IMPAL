@@ -6,8 +6,6 @@ import { authenticateToken } from "../middleware/authmiddleware.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-console.log("TEST");
-
 export const login = async (req, res) => {
     const { email, password } = req.body;
     
@@ -45,7 +43,11 @@ export const register = async (req, res) => {
         // Cek email sudah ada atau belum
         const exist = await prisma.user.findUnique({ where: { email } });
         if (exist) return res.status(400).json({ message: "Email sudah terdaftar" });
-    
+
+        if (!name) {
+           name = "User";
+        }
+
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
         // const hashedPassword = password; // Untuk demo, simpan password apa adanya

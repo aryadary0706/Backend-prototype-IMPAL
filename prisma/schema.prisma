@@ -15,12 +15,11 @@ datasource db {
 
 
 model User {
-  id          Int          @id @default(autoincrement())
+  id          String          @id @default(uuid())
   email       String          @unique
-  name        String
+  name        String?          
   password    String
   createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
 
   identifications Identification[]
   historyManagers HistoryManager[]
@@ -29,12 +28,14 @@ model User {
 
 model Identification {
   id                 String    @id @default(uuid())
-  userId             Int
+  userId             String
   imagePath          String
   plantName          String
+  isHealthy          Boolean
   diseaseName        String
   diseaseDescription String
   confidenceScore    Float
+  TreatmentAdvice   String
   createdAt          DateTime  @default(now())
 
   user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -43,11 +44,10 @@ model Identification {
 
 model HistoryManager {
   id         String    @id @default(uuid())
-  userId     Int
-  action     String
+  userId     String
   timestamp  DateTime  @default(now())
   resultId   String   
 
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade) 
-  identifications Identification @relation(fields: [resultId], references: [id], onDelete: Cascade)
+  identification Identification @relation(fields: [resultId], references: [id], onDelete: Cascade)
 }
