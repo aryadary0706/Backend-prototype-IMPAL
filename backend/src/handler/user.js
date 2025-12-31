@@ -7,8 +7,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-console.log("TEST");
-
 export const login = async (req, res) => {
     const { email, password } = req.body;
     
