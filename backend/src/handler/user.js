@@ -7,8 +7,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-console.log("TEST");
-
 export const login = async (req, res) => {
     const { email, password } = req.body;
     
@@ -49,7 +47,6 @@ export const register = async (req, res) => {
     
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
-        // const hashedPassword = password; // Untuk demo, simpan password apa adanya
     
         // Simpan user
         await prisma.user.create({
