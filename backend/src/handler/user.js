@@ -47,7 +47,6 @@ export const register = async (req, res) => {
     
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
-        // const hashedPassword = password; // Untuk demo, simpan password apa adanya
     
         // Simpan user
         await prisma.user.create({
