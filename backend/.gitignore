@@ -1,0 +1,5 @@
+# Backend-specific ignores.
+# Most rules live in the repo root .gitignore.
+
+generated/prisma/
+prisma/generated/

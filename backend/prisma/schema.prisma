@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  email           String           @unique
+  name            String?
+  password        String
+  createdAt       DateTime         @default(now())
+  id              String           @id
+  historyManagers HistoryManager[]
+  identifications Identification[]
+}
+
+model Identification {
+  id                 String           @id @default(uuid())
+  imagePath          String
+  plantName          String
+  diseaseName        String
+  diseaseDescription String
+  confidenceScore    Float
+  createdAt          DateTime         @default(now())
+  userId             String
+  TreatmentAdvice    String
+  isHealthy          Boolean
+  histories          HistoryManager[]
+  user               User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model HistoryManager {
+  id              String         @id @default(uuid())
+  timestamp       DateTime       @default(now())
+  resultId        String
+  userId          String
+  identifications Identification @relation(fields: [resultId], references: [id], onDelete: Cascade)
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
